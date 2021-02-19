@@ -64,6 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ExampleScriptsfromGI455\LobbyRoomExample\Scripts\Example.cs" />
+    <Compile Include="Assets\ExampleScriptsfromGI455\LobbyRoomExample\Scripts\LobbyManager.cs" />
+    <Compile Include="Assets\ExampleScriptsfromGI455\LobbyRoomExample\Scripts\Room.cs" />
+    <Compile Include="Assets\ExampleScriptsfromGI455\ProgramChatWithJson\Scripts\WebSocketConnection.cs" />
+    <Compile Include="Assets\ExampleScriptsfromGI455\Week4 Homework\WebsocketConnection.cs" />
     <Compile Include="Assets\Scripts\ShowText.cs" />
     <Compile Include="Assets\Scripts\WebSocketConnections.cs" />
     <Reference Include="UnityEngine">
