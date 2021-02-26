@@ -2,13 +2,13 @@ const app = require('express')();
 const server = require('http').Server(app);
 const websocket = require('ws');
 const wss = new websocket.Server({server});
+const sqlite3 = require('sqlite3').verbose();
 
 server.listen(process.env.PORT || 16592, ()=>{
     console.log("Server start at port "+server.address().port);
 });
 
-//var wsList = [];
-var roomList = [];
+
 /*
 {
     roomName: ""
@@ -16,24 +16,45 @@ var roomList = [];
 }
 */
 
-wss.on("connection", (ws)=>{
+var db = new sqlite3.Database('./database/chatDB.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err)=>
+{
+    if(err) throw err;
+
+    console.log("Connect to Database");
     
+    var wsList = [];
+    var roomList = [];
+    wss.on("connection", (ws)=>{    
+
     //Lobby
     console.log("client connected.");
     //Reception
     ws.on("message", (data)=>{
         console.log("send from client :"+ data);
+        
+        var toJsonObj = {
+            eventName:"",
+            data:"test#111111",
+            username:""
+        }
+        //===============================================
+        toJsonObj = JSON.parse(data);
+        //===============================================
+
+        // SaveData
+        var splitStr = toJsonObj.data.split('#');
+
+        var userID = splitStr[0];
+        var password = splitStr[1];
+        var name = splitStr[2];
 
         //========== Convert jsonStr into jsonObj =======
 
         //toJsonObj = JSON.parse(data);
 
         // I change to line below for prevent confusion
-        var toJsonObj = { 
-            roomName:"",
-            data:""
-        }
-        toJsonObj = JSON.parse(data);
+        
+        
         //===============================================
 
         if(toJsonObj.eventName == "CreateRoom")//CreateRoom
@@ -200,17 +221,88 @@ wss.on("connection", (ws)=>{
                 console.log("leave room fail");
             }
         }
+        else if(toJsonObj.eventName == "Login"){
+            var sqlSelect = "SELECT * FROM USERDATA WHERE UserID = '"+userID+"' AND Password= '"+password+"'"; //Login
+            db.all(sqlSelect,(err, rows)=>
+            {
+                if(err)
+                {
+                console.log(err);
+                }
+                else
+                {
+                if(rows.length > 0)
+                {
+                    console.log("==========[1]========")
+                    console.log(rows);
+                    console.log("==========[1]========")
+                    var callbackMsg = 
+                    {
+                        eventName: "Login",
+                        data:rows[0].Name
+                    }
+
+                    var toJsonStr = JSON.stringify(callbackMsg);
+                    ws.send(toJsonStr);
+                    console.log("[2]" +toJsonStr);
+                }
+                else
+                {
+                    var callbackMsg = 
+                    {
+                        eventName: "Login",
+                        data:"Fail"
+                    }
+
+                    var toJsonStr = JSON.stringify(callbackMsg);
+                    ws.send(toJsonStr);
+                    console.log("[3]" +toJsonStr);
+                }
+            
+            }
+        })
+        }
+        else if(toJsonObj.eventName == "Register"){
+            var sqlInsert = `INSERT INTO UserData (UserID, Password, Name) VALUES ('${userID}', '${password}', '${name}')`;
+            db.all(sqlInsert, (err, rows)=>{
+                if(err){
+                    console.log(err);
+
+                    var callbackMsg = {
+                        eventName:"Register",
+                        data:"Fail"
+                    }
+                    //===============================================
+                    var toJsonStr = JSON.stringify(callbackMsg);
+                    ws.send(toJsonStr);
+                    //=======================================================
+                    console.log("[0]" +toJsonStr);
+                }
+                else{
+                    var callbackMsg = {
+                        eventName:"Register",
+                        data:"success"
+                    }
+                    //===============================================
+                    var toJsonObj = JSON.stringify(callbackMsg);
+                    ws.send(toJsonObj);
+                    //=======================================================
+                    console.log("[1]" +toJsonStr);
+                }
+            })
+        }   
+    });
     });
 
 
-    /*wsList.push(ws);
+    //wsList.push(ws);
     
-    ws.on("message", (data)=>{
+    /*ws.on("message", (data)=>{
         console.log("send from client :"+ data);
         Boardcast(data);
     });
     */
-    ws.on("close", ()=>{
+    wss.on("close", ()=>{
         console.log("client disconnected.");
 
         //============ Find client in room for remove client out of room ================
@@ -236,9 +328,24 @@ wss.on("connection", (ws)=>{
 
 function Boardcast(data)
 {
-    /*for(var i = 0; i < wsList.length; i++)
+    var selectRoomIndex = -1;
+
+    for (var i = 0; i < roomList.length; i++)
     {
-        wsList[i].send(data);
-    }*/
+        for (var j = 0; j < roomList[i].wsList.length; j++)
+        {
+            if (ws == roomList[i].wsList[j])
+            {
+                selectRoomIndex = i;
+                console.log(selectRoomIndex);
+                break;
+            }
+        }
+    }
+
+    for (var i = 0; i < roomList[selectRoomIndex].wsList.length; i++)
+    {
+        roomList[selectRoomIndex].wsList[i].send(message);
+    }
 }
 

@@ -49,23 +49,23 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 11250}
-    - Class: 114
-      Script: {instanceID: 11410}
+      Script: {instanceID: 11252}
     - Class: 114
       Script: {instanceID: 11412}
     - Class: 114
-      Script: {instanceID: 11450}
+      Script: {instanceID: 11414}
     - Class: 114
-      Script: {instanceID: 11550}
+      Script: {instanceID: 11452}
     - Class: 114
-      Script: {instanceID: 11750}
+      Script: {instanceID: 11552}
     - Class: 114
-      Script: {instanceID: 11840}
+      Script: {instanceID: 11752}
     - Class: 114
-      Script: {instanceID: 12034}
+      Script: {instanceID: 11842}
     - Class: 114
-      Script: {instanceID: 12048}
+      Script: {instanceID: 12036}
+    - Class: 114
+      Script: {instanceID: 12050}
     - Class: 114
       Script: {instanceID: 12230}
     - Class: 114
@@ -311,7 +311,7 @@ ScriptsOnlyBuild:
     className: ScrollRect
   - hash:
       serializedVersion: 2
-      Hash: 4f435e264f6953c07e36e20ba4537de1
+      Hash: 48e3006fafee0ac13f800dffabed887e
     assemblyName: Assembly-CSharp.dll
     namespaceName: OnlineChatWithJson
     className: WebSocketConnections
